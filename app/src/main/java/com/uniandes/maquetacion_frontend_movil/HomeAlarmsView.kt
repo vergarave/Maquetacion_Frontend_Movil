@@ -13,11 +13,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.withScale
 
-/**
- * Pixel-accurate rendering of the 390 x 844 "Home - Alarmas" Figma frame.
- * The complete composition scales uniformly from the device width so it keeps
- * the same proportions on different portrait Android phones.
- */
 class HomeAlarmsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -25,6 +20,7 @@ class HomeAlarmsView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     var onAlarmClick: ((Int) -> Unit)? = null
+    var onSettingsClick: (() -> Unit)? = null
 
     private data class Alarm(
         var time: String,
@@ -211,6 +207,7 @@ class HomeAlarmsView @JvmOverloads constructor(
 
         if (x in 326f..374f && y in 46f..94f) {
             performClick()
+            onSettingsClick?.invoke()
             return true
         }
         return true

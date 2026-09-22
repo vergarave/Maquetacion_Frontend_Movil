@@ -9,12 +9,10 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 
-/** Pixel-accurate rendering of the 390 x 844 "Editar Alarma" Figma frame. */
 class EditAlarmView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -32,8 +30,16 @@ class EditAlarmView @JvmOverloads constructor(
     private val regular = weightedTypeface(400)
     private val semiBold = weightedTypeface(600)
     private val bold = weightedTypeface(700)
-    private val chevron = AppCompatResources.getDrawable(context, R.drawable.ic_alarm_chevron_down)
-    private val backIcon = AppCompatResources.getDrawable(context, R.drawable.ic_alarm_back)
+    private val chevron = ResourcesCompat.getDrawable(
+        resources,
+        R.drawable.ic_alarm_chevron_down,
+        context.theme,
+    )
+    private val backIcon = ResourcesCompat.getDrawable(
+        resources,
+        R.drawable.ic_alarm_back,
+        context.theme,
+    )
 
     private val dayLabels = arrayOf("L", "M", "M", "J", "V", "S", "D")
     private val dayLefts = floatArrayOf(43f, 88f, 133f, 178f, 223f, 268f, 313f)

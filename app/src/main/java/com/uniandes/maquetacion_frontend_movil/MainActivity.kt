@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 class MainActivity : AppCompatActivity() {
     private lateinit var screenContainer: FrameLayout
     private lateinit var homeView: HomeAlarmsView
-    private var isEditingAlarm = false
+    private var isShowingSecondaryScreen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,12 +21,13 @@ class MainActivity : AppCompatActivity() {
         homeView = HomeAlarmsView(this).apply {
             contentDescription = getString(R.string.home_alarms_accessibility)
             onAlarmClick = { alarmIndex -> showEditAlarm(alarmIndex) }
+            onSettingsClick = ::showSettings
         }
         showHome()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (isEditingAlarm) showHome() else finish()
+                if (isShowingSecondaryScreen) showHome() else finish()
             }
         })
         hideSystemBars()
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showHome() {
-        isEditingAlarm = false
+        isShowingSecondaryScreen = false
         screenContainer.removeAllViews()
         screenContainer.addView(
             homeView,
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showEditAlarm(alarmIndex: Int) {
-        isEditingAlarm = true
+        isShowingSecondaryScreen = true
         val editView = EditAlarmView(this).apply {
             contentDescription = getString(R.string.edit_alarm_accessibility)
             setInitialAlarm(
@@ -74,6 +75,22 @@ class MainActivity : AppCompatActivity() {
         screenContainer.removeAllViews()
         screenContainer.addView(
             editView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+    }
+
+    private fun showSettings() {
+        isShowingSecondaryScreen = true
+        val settingsView = SettingsView(this).apply {
+            contentDescription = getString(R.string.settings_accessibility)
+            onBackClick = ::showHome
+        }
+        screenContainer.removeAllViews()
+        screenContainer.addView(
+            settingsView,
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT,
