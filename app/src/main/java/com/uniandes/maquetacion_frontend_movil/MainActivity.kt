@@ -1,16 +1,34 @@
 package com.uniandes.maquetacion_frontend_movil
 
 import android.os.Bundle
+import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var screenContainer: FrameLayout
+    private lateinit var homeView: HomeAlarmsView
+    private var isEditingAlarm = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
+        screenContainer = findViewById(R.id.screenContainer)
+        homeView = HomeAlarmsView(this).apply {
+            contentDescription = getString(R.string.home_alarms_accessibility)
+            onAlarmClick = { alarmIndex -> showEditAlarm(alarmIndex) }
+        }
+        showHome()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isEditingAlarm) showHome() else finish()
+            }
+        })
         hideSystemBars()
     }
 
@@ -25,5 +43,41 @@ class MainActivity : AppCompatActivity() {
             systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+    }
+
+    private fun showHome() {
+        isEditingAlarm = false
+        screenContainer.removeAllViews()
+        screenContainer.addView(
+            homeView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+    }
+
+    private fun showEditAlarm(alarmIndex: Int) {
+        isEditingAlarm = true
+        val editView = EditAlarmView(this).apply {
+            contentDescription = getString(R.string.edit_alarm_accessibility)
+            setInitialAlarm(
+                homeView.getAlarmTime(alarmIndex),
+                homeView.getAlarmPeriod(alarmIndex),
+            )
+            onBackClick = ::showHome
+            onSaveClick = { time, period ->
+                homeView.updateAlarmTime(alarmIndex, time, period)
+                showHome()
+            }
+        }
+        screenContainer.removeAllViews()
+        screenContainer.addView(
+            editView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
     }
 }

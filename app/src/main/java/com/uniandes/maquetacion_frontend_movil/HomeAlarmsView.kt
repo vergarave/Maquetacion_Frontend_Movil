@@ -24,10 +24,13 @@ class HomeAlarmsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
+    var onAlarmClick: ((Int) -> Unit)? = null
+
     private data class Alarm(
-        val time: String,
+        var time: String,
         val label: String,
         val selectedDays: BooleanArray,
+        var period: String = "AM",
         var enabled: Boolean = true,
     )
 
@@ -103,7 +106,7 @@ class HomeAlarmsView @JvmOverloads constructor(
         drawText(canvas, alarm.time, 41f, top + 49f, 32f, TEXT_PRIMARY, medium)
         setTextPaint(32f, medium, TEXT_PRIMARY)
         val periodX = 41f + paint.measureText(alarm.time) + 8f
-        drawText(canvas, "AM", periodX, top + 48f, 20f, SECONDARY, medium)
+        drawText(canvas, alarm.period, periodX, top + 48f, 20f, SECONDARY, medium)
         drawText(canvas, alarm.label, 41f, top + 78f, 16f, SECONDARY, semiBold)
 
         dayLabels.forEachIndexed { index, label ->
@@ -196,11 +199,33 @@ class HomeAlarmsView @JvmOverloads constructor(
             }
         }
 
+        if (x in 20f..370f) {
+            cardTops.forEachIndexed { alarmIndex, top ->
+                if (y in top..(top + 140f)) {
+                    performClick()
+                    onAlarmClick?.invoke(alarmIndex)
+                    return true
+                }
+            }
+        }
+
         if (x in 326f..374f && y in 46f..94f) {
             performClick()
             return true
         }
         return true
+    }
+
+    fun getAlarmTime(index: Int): String = alarms.getOrNull(index)?.time ?: "7:30"
+
+    fun getAlarmPeriod(index: Int): String = alarms.getOrNull(index)?.period ?: "AM"
+
+    fun updateAlarmTime(index: Int, time: String, period: String) {
+        alarms.getOrNull(index)?.let { alarm ->
+            alarm.time = time
+            alarm.period = period
+            invalidate()
+        }
     }
 
     override fun performClick(): Boolean {
