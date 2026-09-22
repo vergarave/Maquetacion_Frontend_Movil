@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Maquetacion_Frontend_Movil</string>
+    <string name="app_name">Amanecer</string>
+    <string name="home_alarms_accessibility">Amanecer. Próxima alarma en 8 horas 30 minutos, a las 7:00 AM. Alarmas: Clase de 9 a las 7:30 AM, Clase de 11 a las 8:30 AM y Entreno a las 6:00 AM.</string>
 </resources>
