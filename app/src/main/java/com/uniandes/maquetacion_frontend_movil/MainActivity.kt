@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var screenContainer: FrameLayout
     private lateinit var homeView: HomeAlarmsView
     private var isShowingSecondaryScreen = false
+    private var notificationSettings = booleanArrayOf(true, true, true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 when (option) {
                     SettingsView.SettingsOption.EDIT_PROFILE -> showEditProfile()
                     SettingsView.SettingsOption.CHANGE_PASSWORD -> showChangePassword()
+                    SettingsView.SettingsOption.NOTIFICATIONS -> showNotifications()
                     else -> Unit
                 }
             }
@@ -132,6 +134,27 @@ class MainActivity : AppCompatActivity() {
         screenContainer.removeAllViews()
         screenContainer.addView(
             passwordView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+    }
+
+    private fun showNotifications() {
+        isShowingSecondaryScreen = true
+        val notificationsView = NotificationsView(this).apply {
+            contentDescription = "Notificaciones"
+            onBackClick = ::showSettings
+            setEnabledStates(notificationSettings)
+            onSaveClick = { states ->
+                notificationSettings = states
+                showSettings()
+            }
+        }
+        screenContainer.removeAllViews()
+        screenContainer.addView(
+            notificationsView,
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT,
