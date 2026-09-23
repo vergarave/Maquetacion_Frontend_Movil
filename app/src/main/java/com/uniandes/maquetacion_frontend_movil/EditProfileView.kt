@@ -9,8 +9,12 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.os.Build
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
-import android.view.View
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.withScale
 
@@ -19,7 +23,7 @@ class EditProfileView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : View(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     var onBackClick: (() -> Unit)? = null
     var onSaveClick: (() -> Unit)? = null
@@ -36,11 +40,19 @@ class EditProfileView @JvmOverloads constructor(
     private val avatar = BitmapFactory.decodeResource(resources, R.drawable.settings_avatar)
 
     private var designScale = 1f
+    private val fieldTops = floatArrayOf(349f, 449f, 549f)
+    private val inputs = arrayOf(
+        createInput("Nombre Usuario"),
+        createInput("usuario@example.com"),
+        createInput("usuario"),
+    )
 
     init {
+        setWillNotDraw(false)
         isClickable = true
         isFocusable = true
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+        inputs.forEach(::addView)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -50,9 +62,9 @@ class EditProfileView @JvmOverloads constructor(
         canvas.withScale(designScale, designScale) {
             drawHeader(this)
             drawProfile(this)
-            drawField(this, "Nombre Completo", "Nombre Usuario", 349f)
-            drawField(this, "Correo", "usuario@example.com", 449f)
-            drawField(this, "Saludo Personalizado", "usuario", 549f)
+            drawField(this, "Nombre Completo", inputs[0], 349f)
+            drawField(this, "Correo", inputs[1], 449f)
+            drawField(this, "Saludo Personalizado", inputs[2], 549f)
             drawSaveButton(this)
         }
     }
@@ -72,12 +84,46 @@ class EditProfileView @JvmOverloads constructor(
         }
     }
 
-    private fun drawField(canvas: Canvas, label: String, value: String, top: Float) {
+    private fun drawField(canvas: Canvas, label: String, input: EditText, top: Float) {
         drawText(canvas, label, 21f, top + 15f, 12f, TEXT_PRIMARY, medium)
         paint.color = CARD
         paint.style = Paint.Style.FILL
         canvas.drawRoundRect(20f, top + 25f, 370f, top + 90f, 30f, 30f, paint)
+        val value = input.text.toString().ifEmpty { input.hint.toString() }
         drawText(canvas, value, 40f, top + 64f, 16f, SECONDARY, medium)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        designScale = width / DESIGN_WIDTH
+        fieldTops.forEachIndexed { index, fieldTop ->
+            val inputLeft = (40f * designScale).toInt()
+            val inputTop = ((fieldTop + 25f) * designScale).toInt()
+            val inputRight = (350f * designScale).toInt()
+            val inputBottom = ((fieldTop + 90f) * designScale).toInt()
+            inputs[index].apply {
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, 16f * designScale)
+                layout(inputLeft, inputTop, inputRight, inputBottom)
+            }
+        }
+    }
+
+    private fun createInput(hint: String): EditText = EditText(context).apply {
+        background = null
+        setPadding(0, 0, 0, 0)
+        setSingleLine(true)
+        gravity = android.view.Gravity.CENTER_VERTICAL
+        includeFontPadding = false
+        typeface = medium
+        setTextColor(Color.TRANSPARENT)
+        setHintTextColor(Color.TRANSPARENT)
+        this.hint = hint
+        contentDescription = hint
+        addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) =
+                this@EditProfileView.invalidate()
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
     }
 
     private fun drawSaveButton(canvas: Canvas) {
