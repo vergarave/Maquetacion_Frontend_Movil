@@ -87,10 +87,51 @@ class MainActivity : AppCompatActivity() {
         val settingsView = SettingsView(this).apply {
             contentDescription = getString(R.string.settings_accessibility)
             onBackClick = ::showHome
+            onOptionClick = { option ->
+                when (option) {
+                    SettingsView.SettingsOption.EDIT_PROFILE -> showEditProfile()
+                    SettingsView.SettingsOption.CHANGE_PASSWORD -> showChangePassword()
+                    else -> Unit
+                }
+            }
         }
         screenContainer.removeAllViews()
         screenContainer.addView(
             settingsView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+    }
+
+    private fun showEditProfile() {
+        isShowingSecondaryScreen = true
+        val profileView = EditProfileView(this).apply {
+            contentDescription = "Editar perfil"
+            onBackClick = ::showSettings
+            onSaveClick = ::showSettings
+        }
+        screenContainer.removeAllViews()
+        screenContainer.addView(
+            profileView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+    }
+
+    private fun showChangePassword() {
+        isShowingSecondaryScreen = true
+        val passwordView = ChangePasswordView(this).apply {
+            contentDescription = "Cambiar contraseña"
+            onBackClick = ::showSettings
+            onSaveClick = ::showSettings
+        }
+        screenContainer.removeAllViews()
+        screenContainer.addView(
+            passwordView,
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT,
