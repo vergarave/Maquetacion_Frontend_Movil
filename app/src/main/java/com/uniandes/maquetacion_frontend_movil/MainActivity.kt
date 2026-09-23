@@ -13,6 +13,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeView: HomeAlarmsView
     private var isShowingSecondaryScreen = false
     private var notificationSettings = booleanArrayOf(true, true, true)
+    private var profileName = "Nombre Apellido"
+    private var profileEmail = "usuario@example.com"
+    private var profileGreeting = "usuario"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         isShowingSecondaryScreen = true
         val settingsView = SettingsView(this).apply {
             contentDescription = getString(R.string.settings_accessibility)
+            setProfile(profileName, profileEmail)
             onBackClick = ::showHome
             onOptionClick = { option ->
                 when (option) {
@@ -111,8 +115,14 @@ class MainActivity : AppCompatActivity() {
         isShowingSecondaryScreen = true
         val profileView = EditProfileView(this).apply {
             contentDescription = "Editar perfil"
+            setProfile(profileName, profileEmail, profileGreeting)
             onBackClick = ::showSettings
-            onSaveClick = ::showSettings
+            onSaveClick = { name, email, greeting ->
+                profileName = name
+                profileEmail = email
+                profileGreeting = greeting
+                showSettings()
+            }
         }
         screenContainer.removeAllViews()
         screenContainer.addView(

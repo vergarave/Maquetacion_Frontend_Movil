@@ -26,7 +26,7 @@ class EditProfileView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var onBackClick: (() -> Unit)? = null
-    var onSaveClick: (() -> Unit)? = null
+    var onSaveClick: ((name: String, email: String, greeting: String) -> Unit)? = null
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
         isDither = true
@@ -53,6 +53,12 @@ class EditProfileView @JvmOverloads constructor(
         isFocusable = true
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         inputs.forEach(::addView)
+    }
+
+    fun setProfile(name: String, email: String, greeting: String) {
+        inputs[0].setText(name)
+        inputs[1].setText(email)
+        inputs[2].setText(greeting)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -144,7 +150,11 @@ class EditProfileView @JvmOverloads constructor(
             }
             x in 20f..370f && y in 764f..824f -> {
                 performClick()
-                onSaveClick?.invoke()
+                onSaveClick?.invoke(
+                    inputs[0].text.toString(),
+                    inputs[1].text.toString(),
+                    inputs[2].text.toString(),
+                )
             }
         }
         return true

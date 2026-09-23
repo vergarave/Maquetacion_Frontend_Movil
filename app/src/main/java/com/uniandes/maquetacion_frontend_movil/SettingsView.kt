@@ -23,6 +23,8 @@ class SettingsView @JvmOverloads constructor(
 
     var onBackClick: (() -> Unit)? = null
     var onOptionClick: ((SettingsOption) -> Unit)? = null
+    private var profileName = "Nombre Apellido"
+    private var profileEmail = "usuario@example.com"
 
     enum class SettingsOption {
         EDIT_PROFILE,
@@ -67,6 +69,12 @@ class SettingsView @JvmOverloads constructor(
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
     }
 
+    fun setProfile(name: String, email: String) {
+        profileName = name
+        profileEmail = email
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawColor(BACKGROUND)
@@ -91,8 +99,8 @@ class SettingsView @JvmOverloads constructor(
         avatar?.let { bitmap ->
             canvas.drawBitmap(bitmap, null, RectF(136f, 135f, 254f, 253f), paint)
         }
-        drawCenteredText(canvas, "Nombre Apellido", 195f, 300f, 32f, TEXT_PRIMARY, semiBold)
-        drawCenteredText(canvas, "usuario@example.com", 195f, 330f, 16f, SECONDARY, semiBold)
+        drawCenteredText(canvas, profileName, 195f, 300f, 32f, TEXT_PRIMARY, semiBold)
+        drawCenteredText(canvas, profileEmail, 195f, 330f, 16f, SECONDARY, semiBold)
     }
 
     private fun drawMenuItem(canvas: Canvas, item: MenuItem) {
